@@ -26,25 +26,25 @@ library(stringi)
 library(tidyr)
 library(stringr)
 
-#baixando o arquivo com os endereços das zonas eleitorais de 2016
+#baixando o arquivo com os endereÃ§os das zonas eleitorais de 2016
 #http://www.tre-sp.jus.br/eleitor/titulo-e-local-de-votacao/consulta-por-zona-eleitoral-e-bairro
 
 #abrindo o arquivo
 enderecos <- read.table("arquivo.csv", header = F, sep=",", quote = "\"", encoding = "latin1")
 
-# tirar os acentos dos endereços e deixando tudo em minusculas
+# tirar os acentos dos endereÃ§os e deixando tudo em minusculas
 enderecos$enderecos <- tolower(stri_trans_general(enderecos$V4, "Latin-ASCII"))
 
-#convertendo os endereços S/N para o número 1
+#convertendo os endereÃ§os S/N para o nÃºmero 1
 enderecos$enderecos <- gsub("S/N", "1", enderecos$enderecos)
 
 #criando uma coluna de ID, que vai ser usada pro merge depois
 enderecos$id <- seq.int(nrow(enderecos))
 
-#criando o complemento, necessário pro endereçamento
+#criando o complemento, necessÃ¡rio pro endereÃ§amento
 enderecos$complemento <- "Sao Paulo, Brasil"
 
-#criando a variável com o endereço completo
+#criando a variÃ¡vel com o endereÃ§o completo
 enderecos$final <- paste(enderecos$enderecos, enderecos$complemento, sep=". ")
 
 #vendo como ficou
@@ -60,7 +60,7 @@ latlong <- read.table("geocode_sp_final.csv", header = T, sep=",", quote = "\"",
 
 glimpse(latlong)
 
-#renomeando a variável que é o id para facilitar o join
+#renomeando a variÃ¡vel que Ã© o id para facilitar o join
 latlong <- latlong %>% 
 rename(id = X)
 
@@ -90,14 +90,14 @@ glimpse(zona)
 
 zona$z1 <- as.character(zona$z1)
 
-#contando quantas zonas tem em cada variável - z1 e z2. Vamos usar o  "ª;" como indicador de uma zona
-zona$z1_n <- str_count(zona$z1, "ª;")
-zona$z2_n <- str_count(zona$z2, "ª;")
+#contando quantas zonas tem em cada variÃ¡vel - z1 e z2. Vamos usar o  "Âª;" como indicador de uma zona
+zona$z1_n <- str_count(zona$z1, "Âª;")
+zona$z2_n <- str_count(zona$z2, "Âª;")
 
 #vendo como ficou
 glimpse(zona)
 
-##vendo o máximo de zonas contidas numa mesma linha
+##vendo o mÃ¡ximo de zonas contidas numa mesma linha
 zona <- zona %>% 
   arrange(desc(z1_n))
 
@@ -108,19 +108,25 @@ zona <- zona %>%
 
 head(zona)
 
-#a variável z1 tem no máximo 46 zonas contidas, z2 tem no máximo 24.
+#a variÃ¡vel z1 tem no mÃ¡ximo 46 zonas contidas, z2 tem no mÃ¡ximo 24.
 
 str_split(
     z1, 
-    sep = "ª;",
+    sep = "Âª;",
     names = c(1:46))
 
 zona <- str_split(zona, z1, c("[1:46"))
 
 c(1:46)
 
+#########################
+#####CONTINUAR DAQUI#####
+#########################
 
-############## traduzir
+
+
+
+
 
 ## Abrir 
 
@@ -130,7 +136,7 @@ View(secao_final)
 
 ## Merge do secao_final com os resultados
 
-###### candidato vira coluna, por seção
+###### candidato vira coluna, por seÃ§Ã£o
 
 ## Group by endereco.. Total validos, candidato.. para tirar a proporcao
 
