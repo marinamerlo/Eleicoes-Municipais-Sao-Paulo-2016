@@ -1,5 +1,6 @@
 #configurando a pasta em que os arquivos serão salvos
-setwd("C:/Users/Marina/Desktop/Desafio1")
+setwd("D:/ufflch/Documents/dados")
+
 #abrindo os pacotes que vou usar usar. Eles já estavam instalados. 
 
 #install.packages("readr")
@@ -12,7 +13,7 @@ library(dplyr)
 ###### Parte 1 - abrindo os dados ######
 ########################################
 
-#baixando o arquivo com os resultados eleitorais de 2016
+#baixando o arquivo com todos os resultados eleitorais de 2016
 url_result <- "http://agencia.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2016.zip"
 download.file(url_result, "temp.zip", quiet = F)
 #descompactando o arquivo e removendo o .zip da pasta
@@ -27,8 +28,7 @@ unzip("temp.zip")
 file.remove("temp.zip")
 
 
-##selecionando os arquivos da região Sudeste
-#(troquei o Sul pelo Sudeste porque tava pra montar o banco do município de São Paulo pra minha dissertação)
+##selecionando os arquivos do Estado de São Paulo
 
 #criando uma lista de todos os arquivos contidos na pasta
 lista.arquivos <-list.files(file.path(getwd()))
@@ -37,8 +37,8 @@ print(lista.arquivos)
 lista.resultados <- grep(pattern="votacao_candidato_munzona_2016_", lista.arquivos, value=TRUE)
 print(lista.resultados)
 
-#pegando somente os arquivos dos estados do Sudeste
-lista.resultados <- lista.resultados[c(7,10,18,25)]
+#pegando somente o arquivo de São Paulo
+lista.resultados <- lista.resultados[c(25)]
 print(lista.resultados)
 
 #criando o dataframe vazio que receberá os dados
@@ -101,8 +101,8 @@ print(lista.arquivos)
 lista.candidatos <- grep(pattern="consulta_cand_2016_", lista.arquivos, value=TRUE)
 print(lista.candidatos)
 
-#pegando somente os arquivos dos estados do Sudeste
-lista.candidatos <- lista.candidatos[c(9,12,20,27)]
+#pegando somente o arquivo de São Paulo
+lista.candidatos <- lista.candidatos[c(27)]
 print(lista.candidatos)
 
 #criando o dataframe vazio que receberá os dados
@@ -167,21 +167,6 @@ for(arquivo in lista.candidatos){
 #removendo o banco de dados parcial ao final do empilhando
 rm(d)
 
-##DUVIDA: AQUI DEU UM ERRO:
-#See spec(...) for full column specifications.
-#Warning: 86614 parsing failures.
-#row col   expected     actual                                                         file
-#1  -- 45 columns 46 columns 'C:/Users/Marina/Desktop/Desafio1/consulta_cand_2016_SP.txt'
-#2  -- 45 columns 46 columns 'C:/Users/Marina/Desktop/Desafio1/consulta_cand_2016_SP.txt'
-#3  -- 45 columns 46 columns 'C:/Users/Marina/Desktop/Desafio1/consulta_cand_2016_SP.txt'
-#4  -- 45 columns 46 columns 'C:/Users/Marina/Desktop/Desafio1/consulta_cand_2016_SP.txt'
-#5  -- 45 columns 46 columns 'C:/Users/Marina/Desktop/Desafio1/consulta_cand_2016_SP.txt'
-#... ... .......... .......... ............................................................
-#See problems(...) for more details.
-
-#problems()
-#Error in withCallingHandlers(expr, warning = function(w) invokeRestart("muffleWarning")) : 
-#  argument "x" is missing, with no default
 
 #checando se os quatro estados foram empilhados
 table(candidatos$SIGLA_UF)
@@ -190,120 +175,118 @@ table(candidatos$SIGLA_UF)
 ############################################
 ###### Parte 2 - data frame resultados #####
 ############################################
-
+names(resultados)
 #selecionando as linhas que contem resultados para vereador, deixando o banco com as variáveis e renomeando-as
 resultados <- resultados %>% 
-  filter(DESCRICAO_CARGO == "PREFEITO") %>%
-  select(SIGLA_UF, SIGLA_UE, CODIGO_MUNICIPIO, NOME_PARTIDO, NUMERO_CAND, TOTAL_VOTOS) %>%
-  rename(ue = SIGLA_UE,
-         uf = SIGLA_UF,
-         cod_mun = CODIGO_MUNICIPIO, 
-         partido = NOME_PARTIDO, 
-         num_cand = NUMERO_CAND, 
-         votos = TOTAL_VOTOS)
+  filter(DESCRICAO_CARGO == "VEREADOR") %>%
+  select(SIGLA_UF, 
+         SIGLA_UE, 
+         CODIGO_MUNICIPIO,
+         NUMERO_ZONA,
+         SIGLA_PARTIDO, 
+         NUMERO_CAND, 
+         SEQUENCIAL_CANDIDATO,
+         NOME_CANDIDATO,
+         NOME_URNA_CANDIDATO,
+         COMPOSICAO_LEGENDA,
+         TOTAL_VOTOS,
+         NOME_MUNICIPIO) %>%
+  rename(uf = SIGLA_UF, 
+         ue = SIGLA_UE, 
+         cod_mun = CODIGO_MUNICIPIO,
+         num_zona = NUMERO_ZONA,
+         sigla = SIGLA_PARTIDO, 
+         num_cand =NUMERO_CAND, 
+         seq = SEQUENCIAL_CANDIDATO,
+         nome = NOME_CANDIDATO,
+         nome_urna = NOME_URNA_CANDIDATO,
+         colig = COMPOSICAO_LEGENDA,
+         votos_total = TOTAL_VOTOS,
+         nome_mun = NOME_MUNICIPIO)
 
 ############################################
 ###### Parte 3 - data frame candidatos #####
 ############################################
-
+names(candidatos)
 #selecionando as linhas que contem candiadtos para vereador, deixando o banco com as variáveis e renomeando-as
 candidatos <- candidatos %>% 
-  filter(DESC_CARGO == "PREFEITO") %>%
-  select(SIGLA_UE, SIGLA_UF,NOME_PARTIDO, NUMERO_CANDIDATO, DESCRICAO_OCUPACAO, DESCRICAO_SEXO ,DESCRICAO_GRAU_INSTRUCAO) %>%
+  filter(DESC_CARGO == "VEREADOR") %>%
+  select(SEQUENCIAL_CANDIDATO,
+         CPF_CAND,
+         DES_SITUACAO_CANDIDATURA,
+         NOME_LEGENDA,
+         NUM_TITULO_ELEITORAL_CANDIDATO,
+         IDADE_DATA_ELEICAO,
+         DESCRICAO_SEXO,
+         DESCRICAO_OCUPACAO, 
+         DESCRICAO_GRAU_INSTRUCAO,
+         DESCRICAO_ESTADO_CIVIL,
+         DESC_COR_RACA,
+         DESPESA_MAX_CAMPANHA,
+         DESC_SIT_TOT_TURNO) %>%
   rename(
-    uf= SIGLA_UF,
-    ue = SIGLA_UE,
-    partido = NOME_PARTIDO, 
-    num_cand = NUMERO_CANDIDATO, 
+    seq = SEQUENCIAL_CANDIDATO,
+    cpf = CPF_CAND,
+    situ = DES_SITUACAO_CANDIDATURA,
+    colig_nome = NOME_LEGENDA,
+    titulo = NUM_TITULO_ELEITORAL_CANDIDATO,
+    idade = IDADE_DATA_ELEICAO,
+    genero = DESCRICAO_SEXO,
     ocup = DESCRICAO_OCUPACAO, 
-    sexo = DESCRICAO_SEXO, 
-    educ = DESCRICAO_GRAU_INSTRUCAO)
+    instru = DESCRICAO_GRAU_INSTRUCAO,
+    estcivil = DESCRICAO_ESTADO_CIVIL,
+    cor = DESC_COR_RACA,
+    despmax = DESPESA_MAX_CAMPANHA,
+    result = DESC_SIT_TOT_TURNO)
 
 ##########################################################
 ###### Parte 4 - agregando e combinando por município#####
 ##########################################################
 
-#criando um banco que tem o agregado de votos por unidade eleitoral
+#criando um banco que tem o agregado de votos por município
 resultado_mun <- resultados %>% 
   group_by(ue) %>% 
-  summarise(votos = sum(votos))
+  summarise(votos_total_mun = sum(votos_total))
 
 #adicionando o voto total por municipio no banco de resultados
-resultados_join <- inner_join(resultados, resultado_mun, by = "ue")
+resultados<- right_join(resultados, resultado_mun, by = "ue")
 
-#renomeando as variáveis voto.x (votação individual) e voto.y (votação total do municipio)
-resultados <- resultados_join %>% rename(voto_cand = votos.x, voto_total_mun = votos.y)
-
-#criando a nova variável que tem a proporção de votos recebidos
-resultados <- resultados %>% 
-  mutate(prop_mun = voto_cand / voto_total_mun)
-
-##########################################################
-###### Parte 5 - agregando e combinando por candidato#####
-##########################################################
-
-#criando um banco que tem o agregado de votos por candidato em cada unidade eleitoral
+#criando um banco que tem o agregado de votos por candidato
 resultado_cand <- resultados %>% 
-  group_by(uf, ue, num_cand) %>% 
-  summarise(votos_cand = sum(voto_cand))
+  group_by(seq) %>% 
+  summarise(votos_total_cand = sum(votos_total))
 
-#adicionando o voto total por candidato no banco de resultados
-resultados_cand_join <- inner_join(resultados, resultado_cand, by = c("uf","ue","num_cand"))
-
-#vendo como ficaram as variáveis depois do join
-glimpse(resultados_cand_join)
-
-#criando a nova variável que tem a proporção de votos recebidos
-resultados <- resultados_cand_join %>% 
-  mutate(prop_mun_cand = voto_cand / votos_cand)
+#adicionando o voto total por municipio no banco de resultados e criando uma variável da porcentagem do candidato
+resultados <- resultados %>%
+  right_join(resultado_cand, by = "seq") %>%
+  mutate(prop_mun_cand = votos_total_cand / votos_total_mun)
 
 ##########################################################
 ###### Parte 6 - agregando e combinando por candidato#####
 ##########################################################
 
-#juntando o banco de candidatos e o de resultados pelo left join, para que as correspondência seja feita
-#pelo banco das candidaturas
+#juntando o banco de candidatos e o de resultados 
 #também deixa o banco apenas com as variáveis únicas
-resultados <- resultados %>%
-  left_join(candidatos, resultados, by = c("ue", "num_cand"))
+resultados_2 <- inner_join(candidatos, resultados, by = c("seq"))
 
-#olhando quais são as variáveis que ficaram no banco
-glimpse(resultados)
+#olhando quais são as variáveis que ficaram no banco pra checar que todas vieram
+glimpse(resultados_2)
 
-#renomeando as que ficaram repetidas no join
-resultados <- resultados %>%
-  rename(uf = uf.x, partido = partido.x) %>%
-  select(uf, ue, cod_mun, partido, num_cand, voto_cand, voto_total_mun, prop_mun, ocup, sexo, educ)
-       
+###############################################################
+###### Parte 6 - selecionando apenas a cidade de São Paulo#####
+###############################################################
 
-#removendo duplicados
-resultados <- resultados[!duplicated(resultados),]
+#vendo qual o código da unidade eleitoral de São Paulo para fazer o filtro.
+#como é a maior cidade, vamos ordenar o banco pelo maior número de votos totais no municipio
 
+dados <- dados %>% arrange(desc(votos_total_mun))
+head(dados)
 
-##########################################################
-###### Parte 7 - treinando tabelas de resultados #########
-##########################################################
+#o número da cidade de SP é 71072
 
-#15- Produza uma tabela que indique o total de votos recebido por cada partido.
-resultados_partido <- resultados %>% 
-  group_by(partido) %>% 
-  summarise(votos_partido = sum(voto_cand)) %>%
-  arrange(desc(votos_partido))
+dados_SP <- dados%>% 
+  filter(ue == "71072")
 
-#16- Produza uma tabela com o total de votos por ocupação d@s candidat@s.
-resultados_ocupacao <- resultados %>% 
-  group_by(ocup) %>% 
-  summarise(votos_ocup = sum(voto_cand)) %>%
-  arrange(desc(votos_ocup))
+#salvando como csv
 
-#17- Produza uma tabela com o total de votos por sexo d@s candidat@s.
-resultados_sexo <- resultados %>% 
-  group_by(sexo) %>% 
-  summarise(votos_sexo = sum(voto_cand)) %>%
-  arrange(desc(votos_sexo))
-
-#18- Produza uma tabela com o total de votos por grau de escolaridade d@s candidat@s.
-resultados_educ <- resultados %>% 
-  group_by(educ) %>% 
-  summarise(votos_educ = sum(voto_cand)) %>%
-  arrange(desc(votos_educ))
+write.table(dados_SP, "result_cand_SP.csv", sep = ";", fileEncoding ="latin1")
