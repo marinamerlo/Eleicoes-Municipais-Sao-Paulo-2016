@@ -119,6 +119,15 @@ zona <- str_split(zona, z1, c("[1:46"))
 
 c(1:46)
 
+##possibilidades de resolução: testar
+http://stackoverflow.com/questions/26804641/using-separate-from-tidyr-with-different-length-vectors
+http://stackoverflow.com/questions/4724938/r-split-unbalanced-list-in-data-frame-column
+http://stackoverflow.com/questions/37731324/split-or-separate-uneven-unequal-strings-with-no-delimiter
+http://stackoverflow.com/questions/35772166/splitting-rows-with-uneven-string-length-into-columns-in-r-using-tidyr
+http://stackoverflow.com/questions/15056456/split-strings-into-columns-in-r-where-each-string-has-a-potentially-different-nu
+http://stackoverflow.com/questions/25244684/split-different-lengths-values-and-bind-to-columns
+
+
 #########################
 #####CONTINUAR DAQUI#####
 #########################
