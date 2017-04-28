@@ -279,12 +279,12 @@ glimpse(resultados_2)
 #vendo qual o código da unidade eleitoral de São Paulo para fazer o filtro.
 #como é a maior cidade, vamos ordenar o banco pelo maior número de votos totais no municipio
 
-dados <- dados %>% arrange(desc(votos_total_mun))
-head(dados)
+resultados_2 <- resultados_2 %>% arrange(desc(votos_total_mun))
+head(resultados_2)
 
 #o número da cidade de SP é 71072
 
-dados_SP <- dados%>% 
+dados_SP <- resultados_2 %>% 
   filter(ue == "71072")
 
 #salvando como csv
