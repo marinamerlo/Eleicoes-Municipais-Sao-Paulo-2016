@@ -21,7 +21,7 @@ colnames(seq) <- c("seq")
 unidados <- left_join(seq, dados, by="seq")
 unidados <- unidados %>%
   select(seq, genero, result) %>%
-  distinct(seq, genero, result)
+  distinct(seq, genero, result) 
 
 #checando se os dados contém os 55 eleitos
 table(unidados$genero, unidados$result)
