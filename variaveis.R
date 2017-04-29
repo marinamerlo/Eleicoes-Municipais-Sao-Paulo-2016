@@ -66,6 +66,14 @@ dados$recurso.f <- ifelse(dados$rectotal == 0, c("Nao Recebeu Recursos"), c("Rec
 dados$recurso.f <- as.factor(dados$recurso.f)
 summary(dados$recurso.f)
 
+
+#################
+####contagens####
+#################
+
+#total de candidaturas 
+dados$cand_total <- 1275
+
 #contagem de candidaturas femininas por partido
 genero_partido <- dados %>%
   filter(genero == "Feminino") %>%
@@ -84,25 +92,22 @@ genero_situ <- dados %>%
   group_by(situ) %>%
   summarise(cand_situ_fem = n())
 
-#total de candidaturas por partido
+#contagem total de candidaturas por partido
 candidaturas_partido <- dados %>%
   group_by(sigla) %>%
   summarise(cand_part = n())
 
-#total de candidaturas por coligação
+#contagem total de candidaturas por coligação
 candidaturas_colig <- dados %>%
   group_by(colig) %>%
   summarise(cand_colig = n())
 
-#total de candidaturas por situação
+#contagem total de candidaturas por situação
 candidaturas_situ <- dados %>%
   group_by(situ) %>%
   summarise(cand_situ = n())
 
-
-
-##juntando no banco de dados
-
+##juntando no banco de dados as contagens
 dados <- dados %>%
   left_join(genero_partido, by = "sigla") %>%
   left_join(genero_colig, by = "colig") %>%
@@ -111,7 +116,7 @@ dados <- dados %>%
   left_join(candidaturas_colig, by = "colig") %>%
   left_join(candidaturas_situ, by = "situ")
 
-#fazendo as variáveis de proporção de candidaturas femininas por partido e coligação
+#fazendo as variáveis de proporção de gênero
 dados <- dados %>%
   mutate(cand_part_fem_pct = (cand_part_fem / cand_part)) %>%
   mutate(cand_colig_fem_pct = (cand_colig_fem / cand_colig)) %>%
