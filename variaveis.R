@@ -1,4 +1,8 @@
-### criando as variáveis necessárias a partir do banco final ###
+setwd(D/Dropbox/Mestrado/Seminário Discente/2017/Dados)
+### criando as variáveis necessárias ##
+
+library(ggplot2)
+library(dplyr)
 
 dados <- dados %>% 
   mutate(genero = recode(genero, 
@@ -7,10 +11,17 @@ dados <- dados %>%
 
 dados <- dados %>% 
   mutate(situ = recode(situ, 
-                       "RENUNCIA" = "Renúncia", #por alguma razão, ele não dá o replace nesse caso. Tive que recorrer ao Excel.
+                       "RENÚNCIA" = "Renúncia", 
                        "DEFERIDO" = "Deferido", 
                        "INDEFERIDO" = "Indeferido", 
                        "INDEFERIDO COM RECURSO" ="Indeferido com Recurso"))
+
+dados <- dados %>% 
+mutate(result = recode(result,
+                     "ELEITO POR MÉDIA" = "Eleito por média", 
+                     "ELEITO POR QP" = "Eleito por QP", 
+                     "NÃO ELEITO" = "Não Eleito", 
+                      "SUPLENTE" ="Suplente"))
 
 
 #renomeando as variáveis de recursos para nomes mais curtos
@@ -29,14 +40,25 @@ dados <- dados %>%
 #variável que tem o total de recursos recebidos
 dados <- dados %>% 
   rowwise() %>% 
-  mutate(rectotal = sum(reccom, recint, recni, reccand, recpart, recfis, recprop, recfin, na.rm=TRUE))
+  mutate(rectotal = sum(as.numeric(reccom), 
+                        as.numeric(recint), 
+                        as.numeric(recni), 
+                        as.numeric(reccand), 
+                        as.numeric(recpart),
+                        as.numeric(recfis),
+                        as.numeric(recprop),
+                        as.numeric(recfin), na.rm=TRUE))
 
 #vendo se ficou ok
 summary(dados$rectotal)  
   
-
 #variável pra indicar se foi eleito ou não em 2016
-dados$eleito <- ifelse(dados$result == "ELEITO POR M\xc9DIA" | dados$result == "ELEITO POR QP", c("Eleito"), c("Nao Eleito"))
+dados <- dados %>% 
+  mutate(eleito = recode(result, 
+                         "Eleito por média" = "Eleito", 
+                         "Eleito por QP" = "Eleito", 
+                         "Suplente" = "Não Eleito",
+                         "Não Eleito" = "Não Eleito"))
 dados$eleito <- as.factor(dados$eleito)
 summary(dados$eleito)
 
@@ -57,6 +79,7 @@ summary(dados$voto_total_cand.log)
 dados$rectotal.log <- as.numeric(log(dados$rectotal))
 #transformando o -Inf em zero, pois é o resultado do log de 0
 dados$rectotal.log[is.infinite(dados$rectotal.log) ] <- 0
+dados$rectotal.log[dados$rectotal.log < 0] <- 0.0000000000000000000001
 summary(dados$rectotal.log)
 
 plot(dados$rectotal.log,dados$voto_total_cand.log)
@@ -66,10 +89,6 @@ dados$recurso.f <- ifelse(dados$rectotal == 0, c("Nao Recebeu Recursos"), c("Rec
 dados$recurso.f <- as.factor(dados$recurso.f)
 summary(dados$recurso.f)
 
-
-#################
-####contagens####
-#################
 
 #total de candidaturas 
 dados$cand_total <- 1275
@@ -92,22 +111,25 @@ genero_situ <- dados %>%
   group_by(situ) %>%
   summarise(cand_situ_fem = n())
 
-#contagem total de candidaturas por partido
+#total de candidaturas por partido
 candidaturas_partido <- dados %>%
   group_by(sigla) %>%
   summarise(cand_part = n())
 
-#contagem total de candidaturas por coligação
+#total de candidaturas por coligação
 candidaturas_colig <- dados %>%
   group_by(colig) %>%
   summarise(cand_colig = n())
 
-#contagem total de candidaturas por situação
+#total de candidaturas por situação
 candidaturas_situ <- dados %>%
   group_by(situ) %>%
   summarise(cand_situ = n())
 
-##juntando no banco de dados as contagens
+
+
+##juntando no banco de dados
+
 dados <- dados %>%
   left_join(genero_partido, by = "sigla") %>%
   left_join(genero_colig, by = "colig") %>%
@@ -116,13 +138,19 @@ dados <- dados %>%
   left_join(candidaturas_colig, by = "colig") %>%
   left_join(candidaturas_situ, by = "situ")
 
-#fazendo as variáveis de proporção de gênero
+#fazendo as variáveis de proporção de candidaturas femininas por partido e coligação
 dados <- dados %>%
   mutate(cand_part_fem_pct = (cand_part_fem / cand_part)) %>%
   mutate(cand_colig_fem_pct = (cand_colig_fem / cand_colig)) %>%
   mutate(cand_situ_fem_pct = (cand_situ_fem / cand_situ))
 
-dados_cand <- dados %>%
-  select(-votos_total, -num_zona)
 
-dados_cand <- distinct(dados_cand) 
+#variável para identificar candidaturas sem votos e sem recursos
+dados$laranja.f <- ifelse(dados$recurso.f == "Nao Recebeu Recursos" & (dados$votos_total_cand == 0), c("Laranja"), c("0"))
+table(dados$laranja.f)
+dados$laranja.f <- as.factor(dados$laranja.f)
+summary(dados$laranja.f)
+
+
+
+
