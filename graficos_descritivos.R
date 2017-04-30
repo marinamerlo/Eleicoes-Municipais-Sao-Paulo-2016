@@ -55,16 +55,10 @@ kdensity <- ggplot(data=dados, aes(x=log.votos_total_cand, fill=genero)) +
 ggsave("kernel_votos.png", width = 15, height = 5)
 
 
-g <- ggplot(dados, aes(voto_total_cand.log, rectotal.log)) + 
-  geom_jitter(alpha=0.3, aes(colour = genero, size = votos_total_cand, shape = eleito))
-g 
 
-
-
-g <- ggplot(dados, aes(voto_total_cand.log, rectotal.log)) + 
-  geom_jitter(alpha = 0.1, aes(colour = genero, size = votos_total_cand, shape = eleito)) + 
-  scale_x_log10() + 
-  scale_fill_grey(start = 0.5, end = 0.7, na.value = "red")  +
-  theme_bw()+
-  scale_y_log10()
-ggsave("teste.png", width = 10, height = 5)
+##Votos por eleito e gênero
+p <- ggplot(dados, aes(x = factor(eleito), y = voto_total_cand)) +
+geom_jitter(alpha = 0.1, aes(colour = genero, size = votos_total_cand, shape = eleito)) +
+theme_bw()+
+scale_fill_grey(start = 0.5, end = 0.7, na.value = "red") 
+ggsave("eleitos_genero_voto.png", width = 10, height = 5)
