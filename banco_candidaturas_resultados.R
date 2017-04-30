@@ -48,7 +48,7 @@ resultados <- data.frame()
 #vai abrir cada uma das listas, renomear as colunas de acordo com o indicado no arquivo LEIAME.
 #incluir no dataframe vazio
 for(arquivo in lista.resultados){
-  resultados <- fread(file.path(getwd(), arquivo), encoding = "Latin-1", header = F)
+  resultados <- fread(file.path(getwd(), arquivo), stringsAsFactors = F, encoding = "Latin-1", header = F)
   names(resultados) <- c("DATA_GERACAO",
                          "HORA_GERACAO",
                          "ANO_ELEICAO", 
@@ -107,7 +107,7 @@ candidatos <- data.frame()
 #incluir no dataframe vazio
 
 for(arquivo in lista.candidatos){
-  candidatos <- fread(file.path(getwd(), arquivo), encoding = "Latin-1", header = F)
+  candidatos <- fread(file.path(getwd(), arquivo), stringsAsFactors = F, encoding = "Latin-1", header = F)
   names(candidatos) <-  c("DATA_GERACAO",
               "HORA_GERACAO",
               "ANO_ELEICAO",
@@ -231,6 +231,11 @@ candidatos <- candidatos %>%
 ###### Parte 4 - agregando e combinando por município#####
 ##########################################################
 
+#deixando as variáveis de voto como numérica e a seq, nossa chave, como string
+resultados$votos_total <- as.numeric(resultados$votos_total)
+resultados$seq <- as.character(resultados$seq)
+candidatos$seq <- as.character(candidatos$seq)
+
 #criando um banco que tem o agregado de votos por município
 resultado_mun <- resultados %>% 
   group_by(ue) %>% 
@@ -275,6 +280,17 @@ head(resultados_2)
 dados_SP <- resultados_2 %>% 
   filter(ue == "71072")
 
-#salvando como csv
+#banco com resultados por candidatos únicos como linha. Seleciona todas as linhas exceto as de voto por zona.
+dados_cand <- dados_SP %>%
+  select(-votos_total, -num_zona)
 
-write.table(dados_SP, "result_cand_SP.csv", sep = ";", fileEncoding ="latin1")
+#deixa as linhas únicas por candidato.
+dados_cand <- distinct(dados_cand) 
+ dados <- dados_cand
+
+#vendo se tem os números corretos de eleitos
+table(dados_cand$result, dados_cand$genero)
+
+#salvando os dois bancos
+write.table(dados_cand, "result_cand_SP.csv", sep = ";", fileEncoding ="latin1")
+write.table(dados_SP, "result_candzona_SP.csv", sep = ";", fileEncoding ="latin1")
