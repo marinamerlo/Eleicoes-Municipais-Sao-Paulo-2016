@@ -121,3 +121,8 @@ dados <- dados %>%
   mutate(cand_part_fem_pct = (cand_part_fem / cand_part)) %>%
   mutate(cand_colig_fem_pct = (cand_colig_fem / cand_colig)) %>%
   mutate(cand_situ_fem_pct = (cand_situ_fem / cand_situ))
+
+dados_cand <- dados %>%
+  select(-votos_total, -num_zona)
+
+dados_cand <- distinct(dados_cand) 
