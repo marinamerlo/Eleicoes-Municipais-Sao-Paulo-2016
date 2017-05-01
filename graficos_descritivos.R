@@ -114,5 +114,130 @@ p <- ggplot(dados_coligacoes, aes(x = colig, y = votos_total_cand, label = nome_
   theme(axis.text.x=element_text(angle=40, hjust=1))
 ggsave("jitter_resultado_genero_votos_coligacao.png", width = 10, height = 5)
 
+###################################################
+#########GRÁFICOS PARA FINANCIAMENTO################
+###################################################
+
+#boxplot dos recursos totais
+bptotal <- ggplot(dados, aes(genero, rectotal.log)) +
+  theme_bw()+
+  geom_boxplot()+
+  labs(title ="Distribuição de Recursos Totais por Gênero", x = "Gênero", y = "Recursos Totais (log)")
+bplot
+ggsave("boxplot_recursos_totais.png", width = 10, height = 5)
+
+
+#boxplot dos recursos do partido
+bppart <- ggplot(dados, aes(genero, recpart.log)) +
+  theme_bw()+
+  geom_boxplot()+
+  labs(title ="Distribuição de Recursos Partidários por Gênero", x = "Gênero", y = "Recursos Partidários (log)")
+bplot
+ggsave("boxplot_recursos_partidarios.png", width = 10, height = 5)
+
+
+#boxplot dos recursos do partido
+bplot3 <- ggplot(dados, aes(genero, reccand.log)) +
+  theme_bw()+
+  geom_boxplot()+
+  labs(title ="Distribuição de Recursos de outros candidatos por Gênero", x = "Gênero", y = "Recursos de outros candidatos (log)")
+bplot
+ggsave("boxplot_recursos_candidatos.png", width = 10, height = 5)
+
+require(gridExtra)
+grid.arrange(bplot2, bplot3, ncol=1)
+ggsave("boxplot_recursos_candidatos_partidos.png", width = 10, height = 5, arrangeGrob(bplot2, bplot3, ncol=1))
+
+
+
+##gráfico de barras de candidaturas por partido e por gênero 
+g <-ggplot(data = dados, aes(x = reorder(sigla, -recpart_fem_pct),  y = recpart, fill = genero)) + 
+  geom_bar(stat = "identity", position = "fill") +
+  theme_bw()+
+  scale_fill_grey(start = 0.5, end = 0.7, na.value = "red") +
+  labs(title ="Distribuição dos recursos partidários por gênero", x = "Partido", y = "% de recursos partidários") + 
+  theme(axis.text.x=element_text(angle=50, hjust=1))
+g
+ggsave("barplot_recursospartido_candidatos.png", width = 10, height = 5)
+
+
+#kernel density dos recursos partidários e total
+ktotal <- ggplot(data=dados, aes(x=rectotal.log, fill=factor(genero))) +
+  geom_density(alpha=0.5) +
+  theme_bw()+
+  scale_fill_grey(name = "Gênero", start = 0.6, end = 0, na.value = "red") +
+  labs(title = "Densidade dos Recursos Totais por Gênero",
+       x = "Log dos Recursos Totais",
+       y = "Densidade")
+
+kpart<- ggplot(data=dados, aes(x=recpart.log, fill=factor(genero))) +
+  geom_density(alpha=0.5) +
+  theme_bw()+
+  scale_fill_grey(name = "Gênero", start = 0.6, end = 0, na.value = "red") +
+  labs(title = "Densidade dos Recursos Partidários por Gênero",
+       x = "Log dos Recursos Partidários",
+       y = "Densidade")
+
+##juntando os kdensity com os boxplot numa mesma figura
+ggsave("boxplot_kdensity_recursos_candidatos_partidos.png", width = 10, height = 5, arrangeGrob(bptotal, ktotal, bppart, kpart, ncol=2))
+
+
+##Recursos des eleites
+dados_eleites <- dados %>%
+  filter(eleito == "Eleito") %>%
+  arrange(desc(rectotal))
+glimpse(dados_eleites)
+dados_eleites <- dados_eleites[-c(1), ]
+#deixando os NA dos recursos como 0 pra indicar que não recebeu nada
+dados_eleites$recpart.log[is.na(dados_eleites$recpart.log)] <- 0
+dados_eleites$rectotal.log[is.na(dados_eleites$rectotal.log)] <- 0
+library(ggrepel)
+
+p <- ggplot(dados_eleites, aes(x = recpart.log, 
+                       y = rectotal.log, 
+                       label = nome_urna, 
+                       size = votos_total_cand, 
+                       colour = factor(genero))) +
+     theme_bw() +
+     scale_colour_grey(name = "Gênero", start = 0, end = 0.6, na.value = "red") +
+     scale_shape_manual(values=c(19)) +
+     geom_jitter(alpha = 0.7) +
+          labs(title ="Distribuição de Recursos Partidários e Totais entre os eleitos", 
+                   x = "Recursos Partidários", 
+                   y = "Recursos totais") + 
+     scale_size_continuous(name = "Número de votos",
+                    breaks = c(0, 5000, 10000, 50000, 100000),
+                    labels=c("Zero votos", "5 mil votos",  "10 mil votos", "50 mil votos", "100 mil votos")) + 
+     geom_text_repel(data = dados_eleitas, size=2) +
+     theme(axis.text.x=element_text(angle=40, hjust=1))
+p
+ggsave("jitter_recursos_genero_votos.png", width = 10, height = 5)
+
+
+#boxplot dos votos dos eleitos
+bplot <- ggplot(dados_eleites, aes(genero, voto_total_cand.log)) +
+  theme_bw()+
+  geom_boxplot()+
+  labs(title ="Distribuição de Votos dos Eleitos por Gênero", x = "Gênero", y = "Votos (log)")
+bplot
+ggsave("boxplot_votos_eleites.png", width = 10, height = 5)
+
+
+#kernel density dos votos eleitos
+kdensity <- ggplot(data=dados_eleites, aes(x=voto_total_cand.log, fill=factor(genero))) +
+  geom_density(alpha=0.5) +
+  theme_bw()+
+  scale_fill_grey(name = "Gênero", start = 0.6, end = 0, na.value = "red") +
+  labs(title = "Gráfico de Densidade dos Votos dos Eleitos por Gênero",
+       x = "Log dos Votos Totais",
+       y = "Densidade")
+kdensity
+ggsave("kernel_votos_eleites.png", width = 10, height = 5)
+
+ggsave("boxplot_kernel_votos_eleites.png", width = 10, height = 5, arrangeGrob(bplot, kdensity, ncol=1))
+
+
+
+
 
 
