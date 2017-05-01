@@ -57,8 +57,21 @@ ggsave("kernel_votos.png", width = 15, height = 5)
 
 
 ##Votos por eleito e gênero
-p <- ggplot(dados_cand, aes(x = factor(eleito), y = votos_total_cand)) +
-  geom_jitter(alpha = 0.7, aes(colour = genero, size = votos_total_cand)) +
-  theme_bw()+
-  scale_fill_grey(start = 0.5, end = 0.7, na.value = "red") 
-p
+#tirando o Suplicy porque ele distorce o gráfico
+dados <- dados %>%
+  arrange(desc(votos_total_cand))
+dados_semsuplicy <- dados[-c(1), ]
+
+
+p <- ggplot(dados_semsuplicy, aes(x = eleito, y = votos_total_cand)) +
+  theme_bw() +
+  scale_colour_grey(name = "Gênero", start = 0, end = 0.6, na.value = "red") +
+  scale_shape_manual(values=c(19)) +
+  geom_jitter(alpha = 0.7, aes(colour = factor(genero), size = votos_total_cand)) +
+  labs(title ="Votação entre eleitos e não eleitos", 
+       x = "Resultado", 
+       y = "Votos") + 
+  scale_size_continuous(name = "Número de votos",
+                      breaks = c(0, 1000, 10000, 50000, 100000),
+                      labels=c("Zero votos", "1 mil votos",  "10 mil votos", "50 mil votos", "100 mil votos")) 
+ggsave("jitter_resultado_genero_votos.png", width = 10, height = 5)
