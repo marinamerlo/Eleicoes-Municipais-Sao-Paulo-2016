@@ -75,3 +75,44 @@ p <- ggplot(dados_semsuplicy, aes(x = eleito, y = votos_total_cand)) +
                       breaks = c(0, 1000, 10000, 50000, 100000),
                       labels=c("Zero votos", "1 mil votos",  "10 mil votos", "50 mil votos", "100 mil votos")) 
 ggsave("jitter_resultado_genero_votos.png", width = 10, height = 5)
+
+
+##votação coligação e gênero
+#usando o banco de dados sem o suplicy, mas filtrando só por coligações que tiveram candidatos eleitos.
+#fazendo uma variável que indica se houve candidato eleito - dummy, pra poder somar depois
+
+dados <- dados %>% 
+  mutate(eleito_dummy = recode(result, 
+                               "Eleito por média" = 1, 
+                               "Eleito por QP" = 1, 
+                               "Suplente" = 0,
+                               "Não Eleito" = 0))
+#fazendo a variável vereadores, que indica quanto cada coligação elegeu no total
+summary(dados$eleito_dummy)
+dados_colig <- dados %>%
+  group_by(colig, eleito_dummy) %>%
+  summarise(vereadores = sum(eleito_dummy)) %>%
+  filter(eleito_dummy == 1)
+
+#criando um banco que só tenha os candidatos que estão em coligações que elegeram ao menos um vereador
+dados_coligacoes <- dados_semsuplicy %>%
+  right_join(dados_colig, by = "colig")
+
+#fazendo o gráfico
+p <- ggplot(dados_coligacoes, aes(x = colig, y = votos_total_cand, label = nome_urna)) +
+  theme_bw() +
+  scale_colour_manual(name = "Gênero", values = c("black","grey69")) +
+  scale_shape_manual(name="Resultado", values=c(18,4)) +
+  geom_jitter(alpha = 0.7, aes(colour = factor(genero), size = votos_total_cand, shape = eleito)) +
+  labs(title ="Votação Por Coligação (somente que elegeram candidatos)", 
+       x = "Coligação", 
+       y = "Votos") + 
+  scale_size_continuous(name = "Número de votos",
+                        breaks = c(0, 1000, 10000, 50000, 100000),
+                        labels=c("Zero votos", "1 mil votos",  "10 mil votos", "50 mil votos", "100 mil votos")) +
+  geom_text_repel(data= dados_eleitas, size=2) +
+  theme(axis.text.x=element_text(angle=40, hjust=1))
+ggsave("jitter_resultado_genero_votos_coligacao.png", width = 10, height = 5)
+
+
+
