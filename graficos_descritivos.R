@@ -46,14 +46,14 @@ ggsave("barplot_candidaturas_genero_situ.png", width = 10, height = 5)
 
 
 #kernel density dos votos
-kdensity <- ggplot(data=dados, aes(x=log.votos_total_cand, fill=genero)) +
-  geom_density(alpha=0.4) +
+kdensity <- ggplot(data=dados, aes(x=voto_total_cand.log, fill=factor(genero))) +
+  geom_density(alpha=0.5) +
   theme_bw()+
-  scale_x_continuous(name="Log dos Votos Totais") +
-  scale_y_continuous(name="Densidade") +
-  guides(fill=guide_legend(title="Gênero"))
-ggsave("kernel_votos.png", width = 15, height = 5)
-
+  scale_fill_grey(name = "Gênero", start = 0.6, end = 0, na.value = "red") +
+  labs(title = "Gráfico de Densidade dos Votos por Gênero",
+       x = "Log dos Votos Totais",
+       y = "Densidade")
+ggsave("kernel_votos.png", width = 10, height = 5)
 
 
 ##Votos por eleito e gênero
