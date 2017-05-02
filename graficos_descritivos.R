@@ -10,26 +10,27 @@ bplot <- ggplot(dados, aes(genero, log.votos_total_cand)) +
 ggsave("boxplot_votos.png", width = 10, height = 5)
 
 
-##gráfico de barras de candidaturas por partido e por gênero (polar)
-g <-ggplot(data = dados, aes(x = reorder(sigla, -cand_part_fem_pct),  y = cand_part, fill = genero)) + 
+##gráfico de barras de candidaturas por partido e por gênero 
+g <-ggplot(data = dados, aes(x = reorder(sigla, cand_part_fem_pct),  y = cand_part, fill = genero)) + 
   geom_bar(stat = "identity", position = "fill") +
   theme_bw()+
   scale_fill_grey(start = 0.5, end = 0.7, na.value = "red")  +
   geom_hline(yintercept = 0.7) +
   labs(title ="Gênero das candidaturas por Partido", x = "Partido", y = "% de candidaturas") + 
   theme(axis.text.x=element_text(angle=50, hjust=1)) + 
-  coord_polar(theta = "x", direction=1 )
+  coord_flip()
 ggsave("barplot_candidaturas_genero_partido_polar.png", width = 10, height = 5)
 
 
 ##gráfico de barras de candidaturas por coligação e por gênero
-g <-ggplot(data = dados, aes(x = reorder(colig, -cand_colig_fem_pct),  y = cand_colig, fill = genero)) + 
+g <-ggplot(data = dados, aes(x = reorder(colig, cand_colig_fem_pct),  y = cand_colig, fill = genero)) + 
   geom_bar(stat = "identity", position = "fill") +
   theme_bw()+
   scale_fill_grey(start = 0.5, end = 0.7, na.value = "red")  +
   geom_hline(yintercept = 0.7) +
   labs(title ="Gênero das candidaturas por Coligação", x = "Coligação", y = "% de candidaturas") + 
-  theme(axis.text.x=element_text(angle=50, hjust=1))
+  theme(axis.text.x=element_text(angle=50, hjust=1)) + 
+  coord_flip()
 ggsave("barplot_candidaturas_genero_colig.png", width = 10, height = 5)
 
 
