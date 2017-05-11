@@ -15,6 +15,7 @@ g <-ggplot(data = dados, aes(x = reorder(sigla, cand_part_fem_pct),  y = cand_pa
   geom_bar(stat = "identity", position = "fill") +
   theme_bw()+
   scale_fill_grey(start = 0.5, end = 0.7, na.value = "red")  +
+#colorido:    scale_fill_manual(values = c("maroon4", "seagreen")) +
   geom_hline(yintercept = 0.7) +
   labs(title ="Gênero das candidaturas por Partido", x = "Partido", y = "% de candidaturas") + 
   theme(axis.text.x=element_text(angle=50, hjust=1)) + 
@@ -27,6 +28,7 @@ g <-ggplot(data = dados, aes(x = reorder(colig, cand_colig_fem_pct),  y = cand_c
   geom_bar(stat = "identity", position = "fill") +
   theme_bw()+
   scale_fill_grey(start = 0.5, end = 0.7, na.value = "red")  +
+#colorido:    scale_fill_manual(values = c("maroon4", "seagreen")) +
   geom_hline(yintercept = 0.7) +
   labs(title ="Gênero das candidaturas por Coligação", x = "Coligação", y = "% de candidaturas") + 
   theme(axis.text.x=element_text(angle=50, hjust=1)) + 
@@ -114,6 +116,26 @@ p <- ggplot(dados_coligacoes, aes(x = colig, y = votos_total_cand, label = nome_
   geom_text_repel(data= dados_eleitas, size=2) +
   theme(axis.text.x=element_text(angle=40, hjust=1))
 ggsave("jitter_resultado_genero_votos_coligacao.png", width = 10, height = 5)
+
+#versão colorida com fundo preto:
+p <- ggplot(dados_coligacoes, aes(x = colig, y = votos_total_cand, alpha=genero,label = nome_urna)) +
+  theme_bw() +
+  scale_colour_manual(name = "Gênero", values = c("coral", "seagreen1")) +
+  scale_shape_manual(name="Resultado", values=c(18,4)) +
+  geom_jitter(aes(colour = factor(genero), size = votos_total_cand, shape = eleito), guide=FALSE) +
+  scale_alpha_manual(values = c(1, 0.4), guide=FALSE) + 
+  labs(title ="Votação Por Coligação (somente que elegeram candidatos)", 
+       x = "Coligação", 
+       y = "Votos") + 
+  scale_size_continuous(name = "Número de votos",
+                        breaks = c(0, 1000, 10000, 50000, 100000),
+                        labels=c("Zero votos", "1 mil votos",  "10 mil votos", "50 mil votos", "100 mil votos")) +
+  geom_text_repel(data= dados_eleitas, size=2, colour="coral4") +
+  theme(axis.text.x=element_text(angle=25, hjust=1)) + 
+  theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(), #tira as linhas
+          panel.background=element_blank()) + #tira as linhas
+  theme(panel.background=element_rect(fill='black')) #pinta o fundo de preto
+ggsave("jitter_resultado_genero_votos_coligacao_cor.png", width = 10, height = 5)
 
 ###################################################
 #########GRÁFICOS PARA FINANCIAMENTO################
