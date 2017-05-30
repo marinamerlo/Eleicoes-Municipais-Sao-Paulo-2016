@@ -1,6 +1,8 @@
 setwd(D/Dropbox/Mestrado/Seminário Discente/2017/Dados)
 ### criando as variáveis necessárias ##
 
+#começando a partir do script banco_final.R
+
 library(ggplot2)
 library(dplyr)
 
@@ -250,33 +252,37 @@ dados_votos_homens <- dados %>%
 #####VARIÁVEIS DE RECURSOS#####
 ###############################
 
-#renomeando as variáveis de recursos para nomes mais curtos
-make.names(names(dados))
+#variável que tem o total de recursos recebidos
+rec_total <- dados %>% 
+  group_by(seq) %>% 
+  summarise(rectotal = sum(as.numeric(valor), na.rm=TRUE))
 
 dados <- dados %>%
-  rename(reccom = `valor.Comercialização de bens ou realização de eventos`,
-         recint = `valor.Doações pela Internet`,
-         recni = `valor.Recursos de origens não identificadas`,
-         reccand = `valor.Recursos de outros candidatos`,
-         recpart = `valor.Recursos de partido político`,
-         recfis = `valor.Recursos de pessoas físicas`,
-         recprop = `valor.Recursos próprios`,
-         recfin = `valor.Rendimentos de aplicações financeiras`)
+  left_join(rec_total, by = "seq")
 
-#variável que tem o total de recursos recebidos
-dados <- dados %>% 
-  rowwise() %>% 
-  mutate(rectotal = sum(as.numeric(reccom), 
-                        as.numeric(recint), 
-                        as.numeric(recni), 
-                        as.numeric(reccand), 
-                        as.numeric(recpart),
-                        as.numeric(recfis),
-                        as.numeric(recprop),
-                        as.numeric(recfin), na.rm=TRUE))
+#total de origem fundo partidário
+rec_fundo <- dados %>% 
+  filter(fonte == "Fundo Partidario") %>%
+  group_by(seq) %>% 
+  summarise(fundototal = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(rec_fundo, by = "seq")
 
-#vendo se ficou ok
-summary(dados$rectotal)
+#total de tipo partido
+rec_partido <- dados %>% 
+  filter(tipo == "Recursos de partido político") %>%
+  group_by(seq) %>% 
+  summarise(partidototal = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(rec_partido, by = "seq") 
+
+#total de tipo pessoa fisica
+rec_pfisica <- dados %>% 
+  filter(tipo == "Recursos de pessoas físicas") %>%
+  group_by(seq) %>% 
+  summarise(pfisicatotal = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(rec_pfisica, by = "seq") 
 
 
 #tirando o log dos recursos totais
