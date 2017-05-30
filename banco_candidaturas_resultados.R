@@ -8,6 +8,7 @@ setwd("C:/Users/Marina/Desktop/DadosEleitoraisSP2016")
 
 library(readr)
 library(dplyr)
+library(data.table)
 
 ########################################
 ###### Parte 1 - abrindo os dados ######
