@@ -146,111 +146,23 @@ dados <- dados %>%
   mutate(cand_situ_fem_pct = (cand_situ_fem / cand_situ))
 
 
-####################################################
-#####VARIÁVEIS DESCRITIVAS DOS VOTOS E RECURSOS#####
-####################################################
-
-dados_recursos_eleitas <- dados %>%
-  filter(genero == "Feminino" & eleito == "Eleito") %>%
-  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
-            media_rectotal = mean(rectotal, na.rm = TRUE),
-            mediana_rectotal = median(rectotal, na.rm = TRUE),
-            desvio_rectotal = sd(rectotal, na.rm = TRUE),
-            minimo_rectotal = min(rectotal, na.rm = TRUE),
-            maximo_rectotal = max(rectotal, na.rm = TRUE),
-            soma_recpart = sum(recpart, na.rm = TRUE),
-            media_recpart = mean(recpart, na.rm = TRUE),
-            mediana_recpart = median(recpart, na.rm = TRUE),
-            desvio_recpart = sd(recpart, na.rm = TRUE),
-            minimo_recpart = min(recpart, na.rm = TRUE),
-            maximo_recpart = max(recpart, na.rm = TRUE))
-
-dados_recursos_eleitos <- dados %>%
-  filter(genero == "Masculino" & eleito == "Eleito") %>%
-  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
-            media_rectotal = mean(rectotal, na.rm = TRUE),
-            mediana_rectotal = median(rectotal, na.rm = TRUE),
-            desvio_rectotal = sd(rectotal, na.rm = TRUE),
-            minimo_rectotal = min(rectotal, na.rm = TRUE),
-            maximo_rectotal = max(rectotal, na.rm = TRUE),
-            soma_recpart = sum(recpart, na.rm = TRUE),
-            media_recpart = mean(recpart, na.rm = TRUE),
-            mediana_recpart = median(recpart, na.rm = TRUE),
-            desvio_recpart = sd(recpart, na.rm = TRUE),
-            minimo_recpart = min(recpart, na.rm = TRUE),
-            maximo_recpart = max(recpart, na.rm = TRUE))
-
-dados_recursos_mulheres <- dados %>%
-  filter(genero == "Feminino") %>%
-  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
-            media_rectotal = mean(rectotal, na.rm = TRUE),
-            mediana_rectotal = median(rectotal, na.rm = TRUE),
-            desvio_rectotal = sd(rectotal, na.rm = TRUE),
-            minimo_rectotal = min(rectotal, na.rm = TRUE),
-            maximo_rectotal = max(rectotal, na.rm = TRUE),
-            soma_recpart = sum(recpart, na.rm = TRUE),
-            media_recpart = mean(recpart, na.rm = TRUE),
-            mediana_recpart = median(recpart, na.rm = TRUE),
-            desvio_recpart = sd(recpart, na.rm = TRUE),
-            minimo_recpart = min(recpart, na.rm = TRUE),
-            maximo_recpart = max(recpart, na.rm = TRUE))
-
-dados_recursos_homens <- dados %>%
-  filter(genero == "Masculino") %>%
-  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
-            media_rectotal = mean(rectotal, na.rm = TRUE),
-            mediana_rectotal = median(rectotal, na.rm = TRUE),
-            desvio_rectotal = sd(rectotal, na.rm = TRUE),
-            minimo_rectotal = min(rectotal, na.rm = TRUE),
-            maximo_rectotal = max(rectotal, na.rm = TRUE),
-            soma_recpart = sum(recpart, na.rm = TRUE),
-            media_recpart = mean(recpart, na.rm = TRUE),
-            mediana_recpart = median(recpart, na.rm = TRUE),
-            desvio_recpart = sd(recpart, na.rm = TRUE),
-            minimo_recpart = min(recpart, na.rm = TRUE),
-            maximo_recpart = max(recpart, na.rm = TRUE))
-
-dados_votos_eleitas <- dados %>%
-  filter(genero == "Feminino" & eleito == "Eleito") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
-
-dados_votos_eleitos <- dados %>%
-  filter(genero == "Masculino" & eleito == "Eleito") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
-
-dados_votos_mulheres <- dados %>%
-  filter(genero == "Feminino") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
-
-dados_votos_homens <- dados %>%
-  filter(genero == "Masculino") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
-
-
-
 ################################
 #####VARIÁVEIS DE RECURSOS#####
 ###############################
+
+###PARA FAZER
+
+###total de recursos por:
+#partido
+#coligação
+
+###total de recursos por
+#tipo
+
+###porcentagem de recursos recebidos por candidato
+#pelo total do partido
+#pelo total da coligação
+
 
 #variável que tem o total de recursos recebidos
 rec_total <- dados %>% 
@@ -357,6 +269,108 @@ dados <- dados %>%
 #fazendo as variáveis de proporção de candidaturas femininas por partido e coligação
 dados <- dados %>%
   mutate(recpart_fem_pct = (recpart_total_fem / recpart_total))
+
+
+####################################################
+#####VARIÁVEIS DESCRITIVAS DOS VOTOS E RECURSOS#####
+####################################################
+
+dados_recursos_eleitas <- dados %>%
+  filter(genero == "Feminino" & eleito == "Eleito") %>%
+  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
+            media_rectotal = mean(rectotal, na.rm = TRUE),
+            mediana_rectotal = median(rectotal, na.rm = TRUE),
+            desvio_rectotal = sd(rectotal, na.rm = TRUE),
+            minimo_rectotal = min(rectotal, na.rm = TRUE),
+            maximo_rectotal = max(rectotal, na.rm = TRUE),
+            soma_recpart = sum(recpart, na.rm = TRUE),
+            media_recpart = mean(recpart, na.rm = TRUE),
+            mediana_recpart = median(recpart, na.rm = TRUE),
+            desvio_recpart = sd(recpart, na.rm = TRUE),
+            minimo_recpart = min(recpart, na.rm = TRUE),
+            maximo_recpart = max(recpart, na.rm = TRUE))
+
+dados_recursos_eleitos <- dados %>%
+  filter(genero == "Masculino" & eleito == "Eleito") %>%
+  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
+            media_rectotal = mean(rectotal, na.rm = TRUE),
+            mediana_rectotal = median(rectotal, na.rm = TRUE),
+            desvio_rectotal = sd(rectotal, na.rm = TRUE),
+            minimo_rectotal = min(rectotal, na.rm = TRUE),
+            maximo_rectotal = max(rectotal, na.rm = TRUE),
+            soma_recpart = sum(recpart, na.rm = TRUE),
+            media_recpart = mean(recpart, na.rm = TRUE),
+            mediana_recpart = median(recpart, na.rm = TRUE),
+            desvio_recpart = sd(recpart, na.rm = TRUE),
+            minimo_recpart = min(recpart, na.rm = TRUE),
+            maximo_recpart = max(recpart, na.rm = TRUE))
+
+dados_recursos_mulheres <- dados %>%
+  filter(genero == "Feminino") %>%
+  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
+            media_rectotal = mean(rectotal, na.rm = TRUE),
+            mediana_rectotal = median(rectotal, na.rm = TRUE),
+            desvio_rectotal = sd(rectotal, na.rm = TRUE),
+            minimo_rectotal = min(rectotal, na.rm = TRUE),
+            maximo_rectotal = max(rectotal, na.rm = TRUE),
+            soma_recpart = sum(recpart, na.rm = TRUE),
+            media_recpart = mean(recpart, na.rm = TRUE),
+            mediana_recpart = median(recpart, na.rm = TRUE),
+            desvio_recpart = sd(recpart, na.rm = TRUE),
+            minimo_recpart = min(recpart, na.rm = TRUE),
+            maximo_recpart = max(recpart, na.rm = TRUE))
+
+dados_recursos_homens <- dados %>%
+  filter(genero == "Masculino") %>%
+  summarise(soma_rectotal = sum(rectotal, na.rm = TRUE),
+            media_rectotal = mean(rectotal, na.rm = TRUE),
+            mediana_rectotal = median(rectotal, na.rm = TRUE),
+            desvio_rectotal = sd(rectotal, na.rm = TRUE),
+            minimo_rectotal = min(rectotal, na.rm = TRUE),
+            maximo_rectotal = max(rectotal, na.rm = TRUE),
+            soma_recpart = sum(recpart, na.rm = TRUE),
+            media_recpart = mean(recpart, na.rm = TRUE),
+            mediana_recpart = median(recpart, na.rm = TRUE),
+            desvio_recpart = sd(recpart, na.rm = TRUE),
+            minimo_recpart = min(recpart, na.rm = TRUE),
+            maximo_recpart = max(recpart, na.rm = TRUE))
+
+dados_votos_eleitas <- dados %>%
+  filter(genero == "Feminino" & eleito == "Eleito") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
+dados_votos_eleitos <- dados %>%
+  filter(genero == "Masculino" & eleito == "Eleito") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
+dados_votos_mulheres <- dados %>%
+  filter(genero == "Feminino") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
+dados_votos_homens <- dados %>%
+  filter(genero == "Masculino") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
 
 
 
