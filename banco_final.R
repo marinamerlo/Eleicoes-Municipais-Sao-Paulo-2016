@@ -297,7 +297,7 @@ write.table(dados_cand, "result_cand_SP.csv", sep = ";", fileEncoding ="latin1")
 write.table(dados_SP, "result_candzona_SP.csv", sep = ";", fileEncoding ="latin1")
 
 ######################################
-DADOS DE RECEITAS
+##########DADOS DE RECEITAS##########
 ######################################
 
 #descompactando o arquivo e removendo o .zip
@@ -362,7 +362,7 @@ receitas <- dados %>%
    setor_origem = `Setor econômico do doador originário`)
 
 receitas <- receitas %>%
-  mutate(valor = as.numeric(gsub(",", ".", gsub("\\.", "", valor))))%>%
+  mutate(valor = as.numeric(sub(",", ".", valor)))%>%
   select(-cpf,-uf,-ue,-sigla,-num_cand,-nome) #variáveis que contém no banco de resultados/candidaturas
 
 #checando se todos os valores estao como numericos:
@@ -376,7 +376,7 @@ write.table(receitas, file="receitas_2016.csv", sep=";", row.names=FALSE)
 ##obs: para ver como deixar o banco com as observações por candidato, ver script banco_receitas.R nesse mesmo repositório
 
 ############################################################################
-JUNTANDO O BANCO DE CANDIDATURAS/RESULTADOS COM O DE RECEITAS
+#####JUNTANDO O BANCO DE CANDIDATURAS/RESULTADOS COM O DE RECEITAS##########
 ############################################################################
 
 #juntando com o banco de candidaturas e resultados
