@@ -1,6 +1,8 @@
 setwd("C:/Users/Marina/Desktop/Financiamento")
 
 #descompactando o arquivo e removendo o .zip
+url_financiamento <-"http://agencia.tse.jus.br/estatistica/sead/odsele/prestacao_contas/prestacao_contas_final_2016.zip"
+download.file(url_financiamento,"prestacao_contas_final_2016.zip")
 unzip("prestacao_contas_final_2016.zip")
 file.remove("prestacao_contas_final_2016.zip")
 
