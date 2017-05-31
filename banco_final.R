@@ -293,8 +293,8 @@ dados <- dados_cand
 table(dados_cand$result, dados_cand$genero)
 
 #salvando os dois bancos
-write.table(dados_cand, "result_cand_SP.csv", sep = ";", fileEncoding ="latin1")
-write.table(dados_SP, "result_candzona_SP.csv", sep = ";", fileEncoding ="latin1")
+write.table(dados_cand, "result_cand_SP.csv", sep = ";", fileEncoding ="latin1", row.names = F)
+write.table(dados_SP, "result_candzona_SP.csv", sep = ";", fileEncoding ="latin1", row.names = F)
 
 ######################################
 ##########DADOS DE RECEITAS##########
