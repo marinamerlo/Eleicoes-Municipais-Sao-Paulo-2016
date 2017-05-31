@@ -364,31 +364,56 @@ receitas <- dados %>%
 receitas <- receitas %>%
   mutate(valor = as.numeric(sub(",", ".", valor)))%>%
   select(-cpf,-uf,-ue,-sigla,-num_cand,-nome) #variáveis que contém no banco de resultados/candidaturas
-
-#checando se todos os valores estao como numericos:
-plot(density(receitas$valor))  
-#checando se existe missing:
-length(receitas$valor[is.na(receitas$valor)])
-
-#salva o banco. Observações são as doações que cada candidato recebeu.
+#salvando o banco com as observações por receita recebida
 write.table(receitas, file="receitas_2016.csv", sep=";", row.names=FALSE)
 
-##obs: para ver como deixar o banco com as observações por candidato, ver script banco_receitas.R nesse mesmo repositório
+#agregando as receitas pelo CPF dos candidatos e pelo tipo de receita recebida
+receitas1 <- aggregate(receitas$valor, by = list(receitas$seq, receitas$tipo), FUN="sum")
+#renomeando as variaveis
+names(receitas1) <- c("seq", "tipo", "valor")
+#deixando observacoes unicas pra cada candidato por CPF
+receitas1 <- reshape(receitas1, timevar = "tipo", idvar = "seq", direction = "wide")
+
+#agregando as receitas pelo CPF dos candidatos e pelo tipo de receita recebida
+receitas2 <- aggregate(receitas$valor, by = list(receitas$seq, receitas$fonte), FUN="sum")
+#renomeando as variaveis
+names(receitas2) <- c("seq", "fonte", "valor")
+#deixando observacoes unicas pra cada candidato por CPF
+receitas2 <- reshape(receitas2, timevar = "fonte", idvar = "seq", direction = "wide")
+
+receitas <- receitas1 %>%
+  left_join(receitas2, by ="seq") %>%
+  rename(valor_tipo_internet_cand = `valor.Doações pela Internet`,
+         valor_tipo_eventos_cand =`valor.Comercialização de bens ou realização de eventos`,
+         valor_tipo_candidatos_cand = `valor.Recursos de outros candidatos`,
+         valor_tipo_partidos_cand = `valor.Recursos de partido político`,
+         valor_tipo_ni_cand = `valor.Recursos de origens não identificadas`,
+         valor_tipo_pfisica_cand = `valor.Recursos de pessoas físicas`,
+         valor_tipo_proprio_cand = `valor.Recursos próprios`,
+         valor_tipo_aplic_cand = `valor.Rendimentos de aplicações financeiras`,
+         valor_origem_fundo_cand = `valor.Fundo Partidario`,
+         valor_origem_outros_cand =`valor.Outros Recursos`)
+
+#salvando os arquivos com as observações por candidato
+write.table(receitas, file="receitas_2016_unico.csv", sep=";", row.names=FALSE)
 
 ############################################################################
 #####JUNTANDO O BANCO DE CANDIDATURAS/RESULTADOS COM O DE RECEITAS##########
 ############################################################################
 
 #juntando com o banco de candidaturas e resultados
-glimpse(dados_SP) #ver arquivo banco_candidaturas_resultados.R
+#receitas <- fread("receitas_2016_unico.csv")
+#dados_cand <- fread("result_cand_SP.csv")
+#juntando com o banco de candidaturas e resultados
+glimpse(dados_cand) #ver arquivo banco_candidaturas_resultados.R
 glimpse(receitas) #ver o script banco_receitas.R
 
 #deixando a variável chave dos dois bancos, o número sequencial do candidato, como numérico
 receitas$seq <- as.numeric(receitas$seq)
-dados_SP$seq <- as.numeric(dados_SP$seq)
+dados_cand$seq <- as.numeric(dados_cand$seq)
 
 #leftjoin, para que os dados do receitas que têm equivalência ao dados_SP sejam adicionados ao dados_SP
-dados <- left_join(dados_SP, receitas, by="seq")
+dados <- left_join(dados_cand, receitas, by="seq")
 
 ##Checando o banco final com o que consta no TSE
 
@@ -427,6 +452,4 @@ chisq.test(prop.dif)
 dados <- dados %>%
   select(-codeleicao, -desceleicao, -datahora)
 
-#salvando o banco final. esse banco está por doação de candidatos. 
-Esse script funciona igual caso o banco "receitas" seja o do script "banco_receitas.R", a diferença é que ficarão observações por votação
-write.table(dados, file="dados_final.csv", sep=";", row.names=FALSE)
+write.table(dados, file="dados_final_unico.csv", sep=";", row.names=FALSE)
