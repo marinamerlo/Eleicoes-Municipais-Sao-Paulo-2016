@@ -333,6 +333,24 @@ dados <- dados %>%
   mutate(valor_tipo_pfisica_cand_pct = valor_tipo_pfisica_cand / valor_total) 
 
 
+
+dados <- dados %>%
+  rowwise() %>%
+   mutate(valor_total = sum(valor_origem_fundo_cand, valor_origem_outros_cand, na.rm=T))
+
+#teste do boxplot
+ggplot()+ 
+  geom_boxplot(aes(x = eleito, y = valor_total, fill=genero), data = dados) +
+  scale_y_log10() +
+  theme_minimal() +
+  scale_fill_brewer(name = "Porte do Município", palette = "Set1") + 
+  labs(title = "Receita  por Habitante",
+       y ="Receita por habitante")+
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.x=element_text(angle=45, hjust=1))
+
+
+
 ##############################################################################################################
 ##daqui pra baixo, ainda falta fazer/checar o código#########################################################
 ##############################################################################################################
