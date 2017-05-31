@@ -6,6 +6,11 @@ setwd(D/Dropbox/Mestrado/Seminário Discente/2017/Dados)
 library(ggplot2)
 library(dplyr)
 
+
+################################################################################################
+#####################################VARIÁVEIS DE VOTOS E CANDIDATURA###########################
+###############################################################################################
+
 dados <- dados %>% 
   mutate(genero = recode(genero, 
                          "MASCULINO" = "Masculino", 
@@ -25,35 +30,7 @@ mutate(result = recode(result,
                      "NÃO ELEITO" = "Não Eleito", 
                       "SUPLENTE" ="Suplente"))
 
-
-#renomeando as variáveis de recursos para nomes mais curtos
-make.names(names(dados))
-
-dados <- dados %>%
-  rename(reccom = `valor.Comercialização de bens ou realização de eventos`,
-         recint = `valor.Doações pela Internet`,
-         recni = `valor.Recursos de origens não identificadas`,
-         reccand = `valor.Recursos de outros candidatos`,
-         recpart = `valor.Recursos de partido político`,
-         recfis = `valor.Recursos de pessoas físicas`,
-         recprop = `valor.Recursos próprios`,
-         recfin = `valor.Rendimentos de aplicações financeiras`)
-    
-#variável que tem o total de recursos recebidos
-dados <- dados %>% 
-  rowwise() %>% 
-  mutate(rectotal = sum(as.numeric(reccom), 
-                        as.numeric(recint), 
-                        as.numeric(recni), 
-                        as.numeric(reccand), 
-                        as.numeric(recpart),
-                        as.numeric(recfis),
-                        as.numeric(recprop),
-                        as.numeric(recfin), na.rm=TRUE))
-
-#vendo se ficou ok
-summary(dados$rectotal)  
-  
+ 
 #variável pra indicar se foi eleito ou não em 2016
 dados <- dados %>% 
   mutate(eleito = recode(result, 
@@ -68,29 +45,6 @@ summary(dados$eleito)
 #deixando gênero como factor
 dados$genero.f <- as.factor(dados$genero)
 summary(dados$genero.f)
-
-
-#tirando o log dos votos
-dados$voto_total_cand.log <- as.numeric(log(dados$votos_total_cand))
-#transformando o -Inf em zero, pois é o resultado do log de 0
-dados$voto_total_cand.log[is.infinite(dados$voto_total_cand.log) ] <- 0
-summary(dados$voto_total_cand.log)
-
-
-#tirando o log dos recursos totais
-dados$rectotal.log <- as.numeric(log(dados$rectotal))
-#transformando o -Inf em zero, pois é o resultado do log de 0
-dados$rectotal.log[is.infinite(dados$rectotal.log) ] <- 0
-dados$rectotal.log[dados$rectotal.log < 0] <- 0.0000000000000000000001
-summary(dados$rectotal.log)
-
-plot(dados$rectotal.log,dados$voto_total_cand.log)
-
-#variável pra indicar se recebeu recursos ou não
-dados$recurso.f <- ifelse(dados$rectotal == 0, c("Nao Recebeu Recursos"), c("Recebeu Recursos"))
-dados$recurso.f <- as.factor(dados$recurso.f)
-summary(dados$recurso.f)
-
 
 #total de candidaturas 
 dados$cand_total <- 1275
@@ -128,9 +82,7 @@ candidaturas_situ <- dados %>%
   group_by(situ) %>%
   summarise(cand_situ = n())
 
-
 ##juntando no banco de dados
-
 dados <- dados %>%
   left_join(genero_partido, by = "sigla") %>%
   left_join(genero_colig, by = "colig") %>%
@@ -146,56 +98,198 @@ dados <- dados %>%
   mutate(cand_situ_fem_pct = (cand_situ_fem / cand_situ))
 
 
-################################
-#####VARIÁVEIS DE RECURSOS#####
-###############################
+################################################################################################
+#####################################VARIÁVEIS DE RECURSOS#####################################
+###############################################################################################
 
-###PARA FAZER
+##########################
+### TOTAL DE RECURSOS ###
 
-###total de recursos por:
-#partido
-#coligação
-
-###total de recursos por
-#tipo
-
-###porcentagem de recursos recebidos por candidato
-#pelo total do partido
-#pelo total da coligação
-
-
-#variável que tem o total de recursos recebidos
-rec_total <- dados %>% 
+#variável que tem o total de recursos recebidos por candidato
+valor_total_cand <- dados %>% 
   group_by(seq) %>% 
-  summarise(rectotal = sum(as.numeric(valor), na.rm=TRUE))
-
+  summarise(valor_total_cand = sum(as.numeric(valor), na.rm=TRUE))
 dados <- dados %>%
-  left_join(rec_total, by = "seq")
+  left_join(valor_total, by = "seq")
+#variável que tem o total de recursos recebidos por partido (soma dos candidatos)
+valor_total_partido <- dados %>% 
+  group_by(sigla) %>% 
+  summarise(valor_total_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_total_partido, by = "sigla")
+#variável que tem o total de recursos recebidos por coligação (soma dos candidatos)
+valor_total_colig <- dados %>% 
+  group_by(colig) %>% 
+  summarise(valor_total_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_total_colig, by = "colig")
 
-#total de origem fundo partidário
-rec_fundo <- dados %>% 
+
+###############################
+### ORIGEM FUNDO PARTIDÁRIO ###
+
+#total de origem fundo partidário por candidato
+valor_origem_fundo_cand <- dados %>% 
   filter(fonte == "Fundo Partidario") %>%
   group_by(seq) %>% 
-  summarise(fundototal = sum(as.numeric(valor), na.rm=TRUE))
+  summarise(valor_origem_fundo_cand = sum(as.numeric(valor), na.rm=TRUE))
 dados <- dados %>%
-  left_join(rec_fundo, by = "seq")
+  left_join(valor_origem_fundo_cand, by = "seq")
+#total de origem fundo partidário por partido (soma dos candidatos)
+valor_origem_fundo_partido <- dados %>% 
+  filter(fonte == "Fundo Partidario") %>%
+  group_by(sigla) %>% 
+  summarise(valor_origem_fundo_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_origem_fundo_partido, by = "sigla")
+#total de origem fundo partidário por coligação (soma dos candidatos)
+valor_origem_fundo_colig <- dados %>% 
+  filter(fonte == "Fundo Partidario") %>%
+  group_by(colig) %>% 
+  summarise(valor_origem_fundo_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_origem_fundo_colig, by = "colig")
 
-#total de tipo partido
-rec_partido <- dados %>% 
+
+##############################
+### TIPO RECURSOS PRÓPRIOS ###
+
+#total do tipo recursos próprios por candidato
+valor_tipo_proprio_cand <- dados %>% 
+  filter(tipo == "Recursos próprios") %>%
+  group_by(seq) %>% 
+  summarise(valor_tipo_proprio_cand = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_proprio_cand, by = "seq") 
+#total do tipo recursos próprios por partido (soma dos candidatos)
+valor_tipo_proprio_partido <- dados %>% 
+  filter(tipo == "Recursos próprios") %>%
+  group_by(sigla) %>% 
+  summarise(valor_tipo_proprio_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_proprio_partido, by = "sigla") 
+#total do tipo recursos próprios por coligação (soma dos candidatos)
+valor_tipo_proprio_colig <- dados %>% 
+  filter(tipo == "Recursos próprios") %>%
+  group_by(colig) %>% 
+  summarise(valor_tipo_proprio_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_proprio_colig, by = "colig") 
+
+
+############################
+### TIPO RECURSOS OUTROS ###
+
+#especificando quais são os tipos de recursos operacionalizados como "Outros"
+outros <- c("Doações pela Internet", 
+            "Comercialização de bens ou realização de eventos", 
+            "Recursos de origens não identificadas", 
+            "Rendimentos de aplicações financeiras")
+
+#total do tipo outros por candidato
+valor_tipo_outros_cand <- dados %>% 
+  filter(tipo %in% outros) %>%
+  group_by(seq) %>% 
+  summarise(valor_tipo_outros_cand = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_outros_cand, by = "seq") 
+#total do tipo outros por partido (soma dos candidatos)
+valor_tipo_outros_partido <- dados %>% 
+  filter(tipo %in% outros) %>%
+  group_by(sigla) %>% 
+  summarise(valor_tipo_outros_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_outros_partido, by = "sigla") 
+#total do tipo outros por coligação (soma dos candidatos)
+valor_tipo_outros_colig <- dados %>% 
+  filter(tipo %in% outros) %>%
+  group_by(colig) %>% 
+  summarise(valor_tipo_outros_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_outros_colig, by = "colig") 
+
+
+#######################################
+### TIPO RECURSOS OUTROS CANDIDATOS ###
+
+#total do tipo recursos próprios por candidato
+valor_tipo_candidatos_cand <- dados %>% 
+  filter(tipo == "Recursos de outros candidatos") %>%
+  group_by(seq) %>% 
+  summarise(valor_tipo_candidatos_cand = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_candidatos_cand, by = "seq") 
+#total do tipo recursos próprios por partido (soma dos candidatos)
+valor_tipo_candidatos_partido <- dados %>% 
+  filter(tipo == "Recursos de outros candidatos") %>%
+  group_by(sigla) %>% 
+  summarise(valor_tipo_candidatos_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_candidatos_partido, by = "sigla") 
+#total do tipo recursos próprios por coligação (soma dos candidatos)
+valor_tipo_candidatos_colig <- dados %>% 
+  filter(tipo == "Recursos de outros candidatos") %>%
+  group_by(colig) %>% 
+  summarise(valor_tipo_candidatos_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_candidatos_colig, by = "colig") 
+
+
+########################################
+### TIPO RECURSOS PARTIDOS POLÍTICOS ###
+
+#total do tipo recursos do partido por candidato
+valor_tipo_partidos_cand <- dados %>% 
   filter(tipo == "Recursos de partido político") %>%
   group_by(seq) %>% 
-  summarise(partidototal = sum(as.numeric(valor), na.rm=TRUE))
+  summarise(valor_tipo_partidos_cand = sum(as.numeric(valor), na.rm=TRUE))
 dados <- dados %>%
-  left_join(rec_partido, by = "seq") 
+  left_join(valor_tipo_partidos_cand, by = "seq") 
+#total do tipo recursos do partido por partido (soma dos candidatos)
+valor_tipo_partidos_partido <- dados %>% 
+  filter(tipo == "Recursos de partido político") %>%
+  group_by(sigla) %>% 
+  summarise(valor_tipo_partidos_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_partidos_partido, by = "sigla") 
+#total do tipo recursos do partido por coligação (soma dos candidatos)
+valor_tipo_partidos_colig <- dados %>% 
+  filter(tipo == "Recursos de partido político") %>%
+  group_by(colig) %>% 
+  summarise(valor_tipo_partidos_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_partidos_colig, by = "colig") 
 
-#total de tipo pessoa fisica
-rec_pfisica <- dados %>% 
+
+###################################
+### TIPO RECURSOS PESSOA FÍSICA ###
+
+#total do tipo recursos do partido por candidato
+valor_tipo_pfisica_cand <- dados %>% 
   filter(tipo == "Recursos de pessoas físicas") %>%
   group_by(seq) %>% 
-  summarise(pfisicatotal = sum(as.numeric(valor), na.rm=TRUE))
+  summarise(valor_tipo_pfisica_cand = sum(as.numeric(valor), na.rm=TRUE))
 dados <- dados %>%
-  left_join(rec_pfisica, by = "seq") 
+  left_join(valor_tipo_pfisica_cand, by = "seq") 
+#total do tipo recursos do partido por partido (soma dos candidatos)
+valor_tipo_pfisica_partido <- dados %>% 
+  filter(tipo == "Recursos de pessoas físicas") %>%
+  group_by(sigla) %>% 
+  summarise(valor_tipo_pfisica_partido = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_pfisica_partido, by = "sigla") 
+#total do tipo recursos do partido por coligação (soma dos candidatos)
+valor_tipo_pfisica_colig <- dados %>% 
+  filter(tipo == "Recursos de pessoas físicas") %>%
+  group_by(colig) %>% 
+  summarise(valor_tipo_pfisica_colig = sum(as.numeric(valor), na.rm=TRUE))
+dados <- dados %>%
+  left_join(valor_tipo_pfisica_colig, by = "colig") 
 
+
+##############################################################################################################
+##daqui pra baixo, ainda falta fazer/checar o código#########################################################
+##############################################################################################################
 
 #tirando o log dos recursos totais
 dados$rectotal.log <- as.numeric(log(dados$rectotal))
