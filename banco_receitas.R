@@ -16,26 +16,84 @@ lista.arquivos
 lista.arquivos <- lista.arquivos[c(26)]
 lista.arquivos
 #abrindo o dataframe
-dados <- read.table(file.path(getwd(), arquivo), sep=";", header=TRUE, stringsAsFactors = F)
-
+for(arquivo in lista.arquivos){
+  dados <- fread(file.path(getwd(), arquivo), stringsAsFactors = F, encoding = "Latin-1", header = T)
+}
 #checando como os dados ficaram por variavel
-glimpse(dados)
+head(dados)
 
+receitas <- dados %>%
+  filter(`Sigla da UE` =="71072" & Cargo == "Vereador") %>%
+  rename(
+    codeleicao =  `Cód. Eleição`,
+    desceleicao = `Desc. Eleição`,
+    datahora = `Data e hora`,
+    cnpjprest = `CNPJ Prestador Conta`,
+    seq = `Sequencial Candidato`,
+    uf = UF,
+    ue = `Sigla da UE`,
+    nomeue = `Nome da UE`,
+    sigla = `Sigla  Partido`,
+    num_cand = `Numero candidato`,
+    cargo = Cargo,
+    nome = `Nome candidato`,
+    cpf = `CPF do candidato`,
+    cpf_vice = `CPF do vice/suplente`,
+    num_recibo = `Numero Recibo Eleitoral`,
+    num_doc = `Numero do documento`,
+    cpf_doador = `CPF/CNPJ do doador`,
+    nome_doador = `Nome do doador`,
+    nome_doador_receita = `Nome do doador (Receita Federal)`,
+    ue_doador = `Sigla UE doador`,
+    num_part_doador = `Número partido doador`,
+    num_cand_doador = `Número candidato doador`,
+    setor_doador = `Setor econômico do doador`,
+    cod_setor_doador = `Cod setor econômico do doador`,
+    data_receita = `Data da receita`,
+    valor = `Valor receita`,
+    tipo = `Tipo receita`,
+    fonte = `Fonte recurso`,
+    especie = `Especie recurso`,
+    desc_receita = `Descricao da receita`,
+    cpf_doador_origem = `CPF/CNPJ do doador originário`,
+    nome_doador_origem = `Nome do doador originário`,
+    nome_doador_origem_receita = `Nome do doador originário (Receita Federal)`,
+    tipo_origem = `Tipo doador originário`,
+    setor_origem = `Setor econômico do doador originário`) %>%
 
-#como os valores vieram em chr, vamos substituir as virgulas por pontos e deixar o resto em numerico:
-dados$Valor.receita <- sub(",", ".", dados$Valor.receita)
-dados$Valor.receita <- as.numeric(dados$Valor.receita)
-#checando se todos os valores estao como numericos:
-plot(density(dados$Valor.receita))  
-#checando se existe missing:
-length(dados$Valor.receita[is.na(dados$Valor.receita)])
+receitas <- receitas %>%
+  mutate(valor = as.numeric(sub(",", ".", valor)))%>%
+  select(-cpf,-uf,-ue,-sigla,-num_cand,-nome)
+
+#salvando o banco com as observações por receita recebida
+write.table(receitas, file="receitas_2016.csv", sep=";", row.names=FALSE)
 
 #agregando as receitas pelo CPF dos candidatos e pelo tipo de receita recebida
-receitas <- aggregate(dados$Valor.receita, by = list(dados$Sequencial.Candidato, dados$Tipo.receita), FUN="sum")
+receitas1 <- aggregate(receitas$valor, by = list(receitas$seq, receitas$tipo), FUN="sum")
 #renomeando as variaveis
-names(receitas) <- c("seq", "tipo_receita", "valor")
+names(receitas1) <- c("seq", "tipo", "valor")
 #deixando observacoes unicas pra cada candidato por CPF
-receitas <- reshape(receitas, timevar = "tipo_receita", idvar = "seq", direction = "wide")
-#salvando os arquivos
-#write.table(dados, file="receita_candidatos_2014.csv", sep=";", row.names=FALSE)
-write.table(receitas, file="receitas_2016.csv", sep=";", row.names=FALSE)
+receitas1 <- reshape(receitas1, timevar = "tipo", idvar = "seq", direction = "wide")
+
+#agregando as receitas pelo CPF dos candidatos e pelo tipo de receita recebida
+receitas2 <- aggregate(receitas$valor, by = list(receitas$seq, receitas$fonte), FUN="sum")
+#renomeando as variaveis
+names(receitas2) <- c("seq", "fonte", "valor")
+#deixando observacoes unicas pra cada candidato por CPF
+receitas2 <- reshape(receitas2, timevar = "fonte", idvar = "seq", direction = "wide")
+
+receitas <- receitas1 %>%
+  left_join(receitas2, by ="seq") %>%
+  rename(valor_tipo_internet_cand = `valor.Doações pela Internet`,
+         valor_tipo_eventos_cand =`valor.Comercialização de bens ou realização de eventos`,
+         valor_tipo_candidatos_cand = `valor.Recursos de outros candidatos`,
+         valor_tipo_partidos_cand = `valor.Recursos de partido político`,
+         valor_tipo_ni_cand = `valor.Recursos de origens não identificadas`,
+         valor_tipo_pfisica_cand = `valor.Recursos de pessoas físicas`,
+         valor_tipo_proprio_cand = `valor.Recursos próprios`,
+         valor_tipo_aplic_cand = `valor.Rendimentos de aplicações financeiras`,
+         valor_origem_fundo_cand = `valor.Fundo Partidario`,
+         valor_origem_outros_cand =`valor.Outros Recursos`)
+
+#salvando os arquivos com as observações por candidato
+write.table(receitas, file="receitas_2016_unico.csv", sep=";", row.names=FALSE)
