@@ -97,6 +97,42 @@ dados <- dados %>%
   mutate(cand_colig_fem_pct = (cand_colig_fem / cand_colig)) %>%
   mutate(cand_situ_fem_pct = (cand_situ_fem / cand_situ))
 
+dados_votos_eleitas <- dados %>%
+  filter(genero == "Feminino" & eleito == "Eleito") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
+dados_votos_eleitos <- dados %>%
+  filter(genero == "Masculino" & eleito == "Eleito") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
+dados_votos_mulheres <- dados %>%
+  filter(genero == "Feminino") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
+dados_votos_homens <- dados %>%
+  filter(genero == "Masculino") %>%
+  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
+            media_votos = mean(votos_total_cand, na.rm = TRUE),
+            mediana_votos = median(votos_total_cand, na.rm = TRUE),
+            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
+            minimo_votos = min(votos_total_cand, na.rm = TRUE),
+            maximo_votos = max(votos_total_cand, na.rm = TRUE))
+
 
 ################################################################################################
 #####################################VARIÁVEIS DE RECURSOS#####################################
@@ -287,6 +323,16 @@ dados <- dados %>%
   left_join(valor_tipo_pfisica_colig, by = "colig") 
 
 
+## porcentagens de recursos por tipo e origem por candidato ##
+dados <- dados %>%
+  mutate(valor_origem_fundo_cand_pct = valor_origem_fundo_cand / valor_total) %>%
+  mutate(valor_tipo_proprio_cand_pct = valor_tipo_proprio_cand / valor_total) %>%
+  mutate(valor_tipo_outros_cand_pct = valor_tipo_outros_cand / valor_total) %>%
+  mutate(valor_tipo_candidatos_cand_pct = valor_tipo_candidatos_cand / valor_total) %>%
+  mutate(valor_tipo_partidos_cand_pct = valor_tipo_partidos_cand / valor_total) %>%
+  mutate(valor_tipo_pfisica_cand_pct = valor_tipo_pfisica_cand / valor_total) 
+
+
 ##############################################################################################################
 ##daqui pra baixo, ainda falta fazer/checar o código#########################################################
 ##############################################################################################################
@@ -429,41 +475,7 @@ dados_recursos_homens <- dados %>%
             minimo_recpart = min(recpart, na.rm = TRUE),
             maximo_recpart = max(recpart, na.rm = TRUE))
 
-dados_votos_eleitas <- dados %>%
-  filter(genero == "Feminino" & eleito == "Eleito") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
 
-dados_votos_eleitos <- dados %>%
-  filter(genero == "Masculino" & eleito == "Eleito") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
-
-dados_votos_mulheres <- dados %>%
-  filter(genero == "Feminino") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
-
-dados_votos_homens <- dados %>%
-  filter(genero == "Masculino") %>%
-  summarise(soma_votos = sum(votos_total_cand, na.rm = TRUE),
-            media_votos = mean(votos_total_cand, na.rm = TRUE),
-            mediana_votos = median(votos_total_cand, na.rm = TRUE),
-            desvio_votos = sd(votos_total_cand, na.rm = TRUE),
-            minimo_votos = min(votos_total_cand, na.rm = TRUE),
-            maximo_votos = max(votos_total_cand, na.rm = TRUE))
 
 
 
