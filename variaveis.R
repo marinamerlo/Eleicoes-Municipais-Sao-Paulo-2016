@@ -146,7 +146,7 @@ valor_total_cand <- dados %>%
   group_by(seq) %>% 
   summarise(valor_total_cand = sum(as.numeric(valor), na.rm=TRUE))
 dados <- dados %>%
-  left_join(valor_total, by = "seq")
+  left_join(valor_total_cand, by = "seq")
 #variável que tem o total de recursos recebidos por partido (soma dos candidatos)
 valor_total_partido <- dados %>% 
   group_by(sigla) %>% 
