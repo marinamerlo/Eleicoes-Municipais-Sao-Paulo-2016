@@ -57,7 +57,7 @@ ggsave("barplot_candidaturas_genero_colig_cor.png", width = 8, height = 5)
 ##gráfico de barras de candidaturas por partido e por gênero 
 g <-ggplot(data = dados, aes(x = reorder(sigla, cand_part_fem_pct),  y = cand_part, fill = genero)) + 
   geom_bar(stat = "identity", position = "fill") +
-  theme_bw()+
+  theme_minimal()+
   scale_fill_manual(name = "Gênero", values = c("maroon4", "seagreen")) +
   geom_hline(yintercept = 0.7) +
   labs(title ="Gênero das candidaturas por Partido", x = "Partido", y = "% de candidaturas") + 
