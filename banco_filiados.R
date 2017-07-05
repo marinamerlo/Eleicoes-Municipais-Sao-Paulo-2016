@@ -226,6 +226,7 @@ filia_mulheres <- filiados %>%
   group_by(sigla) %>%
   summarise(n_mulheres_partido = n())
 
+
 filia_homens <- filiados %>%
   filter(sexo == "MASCULINO") %>%
   group_by(sigla) %>%
@@ -235,10 +236,20 @@ filia_indet <- filiados %>%
   filter(sexo == "INDETERMINADO") %>%
   group_by(sigla) %>%
   summarise(n_indet_partido = n())
-  
+
+filia_total <- filiados %>%
+  group_by(sigla) %>%
+  summarise(n_partido = n())
+
+
 filiados <- filiados %>%
   mutate(sexo = ifelse(is.na(sexo), "INDETERMINADO", sexo)) %>%
   mutate(n_total = n()) %>%
   left_join(filia_mulheres, by = "sigla") %>%
   left_join(filia_homens, by = "sigla") %>%
   left_join(filia_indet, by = "sigla")
+
+
+filiados <- filiados %>%
+  left_join(filia_total, by = "sigla") %>%
+  mutate(pct = n_mulheres_partido / n_partido)
