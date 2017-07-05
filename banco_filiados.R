@@ -221,6 +221,12 @@ rm(dado)
 rm(nomes)
 
 ##fazendo as variáveis!
+
+###refazer as contagens considerando apenas os filiados regulares
+filiados_reg <- filiados %>%
+  filter(situ_reg == "REGULAR")
+
+
 filia_mulheres <- filiados %>%
   filter(sexo == "FEMININO") %>%
   group_by(sigla) %>%
