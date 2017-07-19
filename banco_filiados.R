@@ -145,15 +145,23 @@ nomes <- candidatos %>%
          nome_comp = NOME_CANDIDATO)
 
 
-#salvando o banco com os nomes completos e o sexo
-write.table(nomes, "nomes_candidatos_genero.csv", sep = ";", fileEncoding ="latin1", row.names = F)
-
 #deixando uma lista única de primeiros nomes por gênero
 nomes <- nomes %>%
   mutate(primeironome = word(nome_comp, 1)) %>%
   mutate(primeironome = tolower(stri_trans_general(primeironome, "Latin-ASCII"))) %>%
   select(-nome_comp)%>%
   distinct()
+
+nomes$duplicado <- duplicated(nomes$primeironome)
+unico <- unique(nomes$primeironome)
+
+duplicados <- nomes %>%
+  filter(duplicado == "TRUE") %>%
+  select(-sexo)
+
+nomes <- nomes %>%
+  filter(duplicado == FALSE)
+
 
 #juntando no banco de filiados
 filiados <- filiados %>%
@@ -197,13 +205,15 @@ filia_gender <- filia_gender %>%
 filia_completo <- bind_rows(filia_gender, filia_cand) %>%
   distinct()
 
+
 #padronizando a codificação da variável
 filia_completo <- filia_completo %>%
   mutate(sexo = ifelse(sexo == "female", "FEMININO", sexo)) %>%
-  mutate(sexo = ifelse(sexo == "male", "MASCULINO", sexo)) 
+  mutate(sexo = ifelse(sexo == "male", "MASCULINO", sexo)) %>%
+  mutate(sexo = ifelse(is.na(sexo), "INDETERMINADO", sexo))
 
 #vendo como ficou
-table(filiados$sexo)
+table(filia_completo$sexo)
 
 #salvando a tabela final
 write.table(filia_completo, "filiados_SP_completo.csv", sep = ";", fileEncoding ="UTF-8", row.names = F)
@@ -223,39 +233,32 @@ rm(nomes)
 ##fazendo as variáveis!
 
 ###refazer as contagens considerando apenas os filiados regulares
-filiados_reg <- filiados %>%
+filiados_reg <- filia_completo %>%
   filter(situ_reg == "REGULAR")
 
-
-filia_mulheres <- filiados %>%
+filia_mulheres <- filiados_reg %>%
   filter(sexo == "FEMININO") %>%
   group_by(sigla) %>%
   summarise(n_mulheres_partido = n())
 
-
-filia_homens <- filiados %>%
+filia_homens <- filiados_reg %>%
   filter(sexo == "MASCULINO") %>%
   group_by(sigla) %>%
   summarise(n_homens_partido = n())
 
-filia_indet <- filiados %>%
+filia_indet <- filiados_reg %>%
   filter(sexo == "INDETERMINADO") %>%
   group_by(sigla) %>%
   summarise(n_indet_partido = n())
 
-filia_total <- filiados %>%
+filia_total <- filiados_reg %>%
   group_by(sigla) %>%
   summarise(n_partido = n())
 
-
-filiados <- filiados %>%
-  mutate(sexo = ifelse(is.na(sexo), "INDETERMINADO", sexo)) %>%
+filiados_reg <- filiados_reg %>%
   mutate(n_total = n()) %>%
   left_join(filia_mulheres, by = "sigla") %>%
   left_join(filia_homens, by = "sigla") %>%
-  left_join(filia_indet, by = "sigla")
-
-
-filiados <- filiados %>%
+  left_join(filia_indet, by = "sigla") %>%
   left_join(filia_total, by = "sigla") %>%
   mutate(pct = n_mulheres_partido / n_partido)
